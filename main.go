@@ -46,18 +46,9 @@ func main() {
 			return err
 		}
 
-		// Security Group: only Tailscale UDP inbound
+		// Security Group: no inbound, Tailscale uses outbound NAT traversal + DERP relays
 		sg, err := ec2.NewSecurityGroup(ctx, "openclaw-sg", &ec2.SecurityGroupArgs{
-			Description: pulumi.String("OpenClaw VPS - Tailscale only"),
-			Ingress: ec2.SecurityGroupIngressArray{
-				&ec2.SecurityGroupIngressArgs{
-					Protocol:    pulumi.String("udp"),
-					FromPort:    pulumi.Int(41641),
-					ToPort:      pulumi.Int(41641),
-					CidrBlocks:  pulumi.StringArray{pulumi.String("0.0.0.0/0")},
-					Description: pulumi.String("Tailscale WireGuard"),
-				},
-			},
+			Description: pulumi.String("OpenClaw VPS - no inbound traffic"),
 			Egress: ec2.SecurityGroupEgressArray{
 				&ec2.SecurityGroupEgressArgs{
 					Protocol:    pulumi.String("-1"),
@@ -211,7 +202,7 @@ func main() {
 
 		// Auto Scaling Group: always 1 instance, spot with on-demand fallback
 		asg, err := autoscaling.NewGroup(ctx, "openclaw-asg", &autoscaling.GroupArgs{
-			MinSize:         pulumi.Int(1),
+			MinSize:         pulumi.Int(0),
 			MaxSize:         pulumi.Int(1),
 			DesiredCapacity: pulumi.Int(1),
 			AvailabilityZones: pulumi.StringArray{
