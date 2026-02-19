@@ -1,0 +1,4 @@
+config:
+  aws:region: eu-north-1
+  openclaw-vps:instanceType: t3.medium
+  openclaw-vps:volumeSize: "10"

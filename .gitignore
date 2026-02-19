@@ -1,0 +1,13 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+openclaw-vps
+.env
+.envrc
+Pulumi.prod.yaml

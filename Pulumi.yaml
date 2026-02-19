@@ -1,0 +1,3 @@
+name: openclaw-vps
+runtime: go
+description: OpenClaw VPS deployment on AWS spot instance with Tailscale networking
