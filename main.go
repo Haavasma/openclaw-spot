@@ -26,6 +26,7 @@ func main() {
 
 		tailscaleAuthKey := cfg.RequireSecret("tailscaleAuthKey")
 		anthropicApiKey := cfg.RequireSecret("anthropicApiKey")
+		snapshotId := cfg.Get("snapshotId")
 
 		// Look up Ubuntu 24.04 AMI
 		ami, err := ec2.LookupAmi(ctx, &ec2.LookupAmiArgs{
@@ -72,15 +73,19 @@ func main() {
 		}
 		az := azs.Names[0]
 
-		// EBS Volume (persistent)
-		volume, err := ebs.NewVolume(ctx, "openclaw-data", &ebs.VolumeArgs{
+		// EBS Volume (persistent, optionally restored from snapshot)
+		volumeArgs := &ebs.VolumeArgs{
 			AvailabilityZone: pulumi.String(az),
-			Size:             pulumi.Int(10),
+			Size:             pulumi.Int(20),
 			Type:             pulumi.String("gp3"),
 			Tags: pulumi.StringMap{
 				"Name": pulumi.String("openclaw-data"),
 			},
-		})
+		}
+		if snapshotId != "" {
+			volumeArgs.SnapshotId = pulumi.String(snapshotId)
+		}
+		volume, err := ebs.NewVolume(ctx, "openclaw-data", volumeArgs)
 		if err != nil {
 			return err
 		}
